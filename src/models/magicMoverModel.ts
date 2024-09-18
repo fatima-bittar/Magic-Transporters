@@ -1,12 +1,11 @@
-import { MagicItemModel } from "./magicItemModel";
+import { magicItemModel } from "./magicItemModel";
 
 export interface magicMoverModel {
-  id: number;
+  id: string;
   name: string;
   weightLimit: number;
   energy: number;
   questState: "resting" | "on a mission" | "loading" | "end";
-  items: MagicItemModel[];
-  itemsCarrying: number;
+  items: magicItemModel[];
   missionsCount: number;
 }
