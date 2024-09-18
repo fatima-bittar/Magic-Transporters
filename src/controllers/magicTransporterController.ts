@@ -27,32 +27,46 @@ router.get("/items", (req, res) => {
 });
 
 router.post("/mover/:moverId/loadingItems", (req, res) => {
-  const { moverId } = req.params;
-  const { itemName } = req.body;
-  const result = magicTransporterFuncs.loadMover(itemName, moverId);
-
-  if (typeof result === "string") {
-    res.status(400).json({ error: result });
-  } else res.status(201).json(result);
+  try {
+    const { moverId } = req.params;
+    const { itemName } = req.body;
+    const result = magicTransporterFuncs.loadMover(itemName, moverId);
+    res.status(201).json(result);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: "An unexpected error occurred" });
+    }
+  }
 });
 
 router.post("/mover/:moverId/startingMission", (req, res) => {
-  const { moverId } = req.params;
-  const result = magicTransporterFuncs.startMissionMover(moverId);
-  if (
-    result === "mover is not found" ||
-    result === "already the mover is on mission"
-  ) {
-    res.status(400).json({ error: result });
-  } else res.status(201).json(result);
+  try {
+    const { moverId } = req.params;
+    const result = magicTransporterFuncs.startMissionMover(moverId);
+    res.status(201).json(result);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: "An unexpected error occurred" });
+    }
+  }
 });
 
 router.post("/mover/:moverId/endingMission", (req, res) => {
-  const { moverId } = req.params;
-  const result = magicTransporterFuncs.endMissionMover(moverId);
-  if (result === "the mover completed its mission") {
+  try {
+    const { moverId } = req.params;
+    const result = magicTransporterFuncs.endMissionMover(moverId);
     res.status(201).json(result);
-  } else res.status(400).json({ error: result });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: "An unexpected error occurred" });
+    }
+  }
 });
 
 router.get("/movers/listing", (req, res) => {

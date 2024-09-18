@@ -1,4 +1,4 @@
-export interface magicItemModel {
+export interface MagicItemModel {
   id: string;
   name: string;
   weight: number;

@@ -1,12 +1,12 @@
-import { magicItemModel } from "../models/magicItemModel";
-import { magicMoverModel } from "../models/magicMoverModel";
+import { MagicItemModel } from "../models/magicItemModel";
+import { MagicMoverModel } from "../models/magicMoverModel";
 import { v4 as uuidv4 } from "uuid";
 
-const items: magicItemModel[] = [];
-const movers: magicMoverModel[] = [];
+const items: MagicItemModel[] = [];
+const movers: MagicMoverModel[] = [];
 export class magicTransporterFunctionalities {
-  addMover(weightLimit: number, name: string, energy: number): magicMoverModel {
-    const newMover: magicMoverModel = {
+  addMover(weightLimit: number, name: string, energy: number): MagicMoverModel {
+    const newMover: MagicMoverModel = {
       weightLimit,
       name,
       energy,
@@ -18,15 +18,15 @@ export class magicTransporterFunctionalities {
     movers.push(newMover);
     return newMover;
   }
-  getAllMovers(): magicMoverModel[] {
+  getAllMovers(): MagicMoverModel[] {
     return movers;
   }
-  getAllItems(): magicItemModel[] {
+  getAllItems(): MagicItemModel[] {
     return items;
   }
 
-  addItem(weight: number, name: string): magicItemModel {
-    const newItem: magicItemModel = {
+  addItem(weight: number, name: string): MagicItemModel {
+    const newItem: MagicItemModel = {
       weight,
       name,
       id: uuidv4(),
@@ -35,22 +35,27 @@ export class magicTransporterFunctionalities {
     return newItem;
   }
 
-  loadMover(itemName: string, moverId: string): magicMoverModel | string {
+  loadMover(itemName: string, moverId: string): MagicMoverModel {
     const mover = movers.find((m) => m.id === moverId);
     const item = items.find((i) => i.name === itemName);
 
-    if (!mover || !item) {
-      return "the mover or item is not found";
+    if (!mover) {
+      throw new Error("The mover is not found");
+    }
+    if (!item) {
+      throw new Error("The item is not found");
     }
     if (mover.questState === "on a mission") {
-      return "The mover is on a mission can't load right now";
+      throw new Error("The mover is on a mission and can't load right now");
     }
+
     const itemsLoadedCount: number = mover.items.reduce((count, item) => {
       return count + item.weight;
     }, 0);
-    const totalWeight: number = item.weight + itemsLoadedCount;
+
+    const totalWeight = item.weight + itemsLoadedCount;
     if (totalWeight >= mover.weightLimit) {
-      return "weight limit has been reached it's maximum limit";
+      throw new Error("Weight limit has been reached");
     }
 
     mover.items.push(item);
@@ -61,35 +66,49 @@ export class magicTransporterFunctionalities {
   startMissionMover(moverId: string): string {
     const mover = movers.find((m) => m.id === moverId);
     if (!mover) {
-      return "mover is not found";
+      throw new Error("Mover is not found");
     }
     if (mover.questState === "on a mission" || mover.questState === "end") {
-      return "already the mover is on mission or still there is no items loaded";
+      throw new Error(
+        "The mover is already on a mission or no items are loaded"
+      );
     }
     if (mover.questState === "loading") {
       mover.questState = "on a mission";
-      return "the mover started its mission";
-    } else return "the mover is resting";
+      return "The mover started its mission";
+    } else {
+      throw new Error("The mover is resting");
+    }
   }
 
   endMissionMover(moverId: string): string {
     const mover = movers.find((m) => m.id === moverId);
     if (!mover) {
-      return "mover is not found";
+      throw new Error("Mover is not found");
     }
     if (mover.questState === "on a mission") {
       mover.questState = "end";
       mover.items = [];
       mover.missionsCount += 1;
-      return "the mover completed its mission";
-    } else
-      return "the mover is either being loaded or resting or already it's ended";
+      return "The mover completed its mission";
+    } else {
+      throw new Error("The mover is not on a mission");
+    }
   }
 
-  getHighestMoverMissions(): magicMoverModel[] {
-    const newMover: magicMoverModel[] = movers.sort(
-      (a, b) => b.missionsCount - a.missionsCount
-    );
-    return newMover;
+  getHighestMoverMissions(): {
+    id: string;
+    missionsCount: number;
+    name: string;
+  }[] {
+    const sortedMovers = movers
+      .sort((a, b) => b.missionsCount - a.missionsCount)
+      .map((mover) => ({
+        id: mover.id,
+        missionsCount: mover.missionsCount,
+        name: mover.name,
+      }));
+
+    return sortedMovers;
   }
 }
