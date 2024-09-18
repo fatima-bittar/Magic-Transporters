@@ -57,4 +57,39 @@ export class magicTransporterFunctionalities {
     mover.questState = "loading";
     return mover;
   }
+
+  startMissionMover(moverId: string): string {
+    const mover = movers.find((m) => m.id === moverId);
+    if (!mover) {
+      return "mover is not found";
+    }
+    if (mover.questState === "on a mission" || mover.questState === "end") {
+      return "already the mover is on mission or still there is no items loaded";
+    }
+    if (mover.questState === "loading") {
+      mover.questState = "on a mission";
+      return "the mover started its mission";
+    } else return "the mover is resting";
+  }
+
+  endMissionMover(moverId: string): string {
+    const mover = movers.find((m) => m.id === moverId);
+    if (!mover) {
+      return "mover is not found";
+    }
+    if (mover.questState === "on a mission") {
+      mover.questState = "end";
+      mover.items = [];
+      mover.missionsCount += 1;
+      return "the mover completed its mission";
+    } else
+      return "the mover is either being loaded or resting or already it's ended";
+  }
+
+  getHighestMoverMissions(): magicMoverModel[] {
+    const newMover: magicMoverModel[] = movers.sort(
+      (a, b) => b.missionsCount - a.missionsCount
+    );
+    return newMover;
+  }
 }

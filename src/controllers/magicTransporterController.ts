@@ -36,4 +36,28 @@ router.post("/mover/:moverId/loadingItems", (req, res) => {
   } else res.status(201).json(result);
 });
 
+router.post("/mover/:moverId/startingMission", (req, res) => {
+  const { moverId } = req.params;
+  const result = magicTransporterFuncs.startMissionMover(moverId);
+  if (
+    result === "mover is not found" ||
+    result === "already the mover is on mission"
+  ) {
+    res.status(400).json({ error: result });
+  } else res.status(201).json(result);
+});
+
+router.post("/mover/:moverId/endingMission", (req, res) => {
+  const { moverId } = req.params;
+  const result = magicTransporterFuncs.endMissionMover(moverId);
+  if (result === "the mover completed its mission") {
+    res.status(201).json(result);
+  } else res.status(400).json({ error: result });
+});
+
+router.get("/movers/listing", (req, res) => {
+  const result = magicTransporterFuncs.getHighestMoverMissions();
+  res.status(201).json(result);
+});
+
 export default router;
